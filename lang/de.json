@@ -117,5 +117,16 @@
   "logs_not_loaded": "Logs wurden noch nicht geladen.",
   "logs_last_update": "Logs aktualisiert: {value}",
   "logs_load_error": "Logs konnten nicht geladen werden:\n\n{error}",
-  "no_logs": "Keine Logzeilen empfangen."
+  "no_logs": "Keine Logzeilen empfangen.",
+  "estimated_value": "Geschätzter Wert",
+  "update_available_title": "Update verfügbar",
+  "update_available_message": "Eine neue Version ist verfügbar.\n\nAktuelle Version: {current}\nNeue Version: {latest}\n\nMöchtest du das Update herunterladen?",
+  "update_ready_title": "Update heruntergeladen",
+  "update_ready_message": "Version {version} wurde heruntergeladen.\n\nMöchtest du sie jetzt installieren?",
+  "update_complete_title": "Update abgeschlossen",
+  "update_complete_message": "Das Update wurde installiert.\nStarte Pi Node Dashboard neu, um die neue Version zu verwenden.",
+  "update_error_title": "Updatefehler",
+  "update_download_error": "Das Update konnte nicht heruntergeladen werden:\n{error}",
+  "update_install_error": "Das Update konnte nicht installiert werden.",
+  "update_install_error_detail": "Das Update konnte nicht installiert werden:\n{error}"
 }

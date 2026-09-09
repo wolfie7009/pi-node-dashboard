@@ -7,13 +7,15 @@ from PySide6.QtWidgets import QApplication
 from utils.config import load_config
 from utils.i18n import set_language
 
+from ui.dashboard import PiDashboard
+
 
 if __name__ == "__main__":
     config = load_config()
     set_language(config.get("language", "en"))
 
     # De UI pas importeren nadat de gekozen taal is geladen.
-    from ui.dashboard import PiDashboard
+
 
     app = QApplication(sys.argv)
 

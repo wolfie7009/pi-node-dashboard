@@ -5,4 +5,6 @@ __pycache__/
 *.pyc
 config.json
 *.spec
+*.deb
 PiNodeDashboard
+pi-node-dashboard_*_amd64/

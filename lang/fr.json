@@ -117,5 +117,16 @@
   "logs_not_loaded": "Les logs n’ont pas encore été chargés.",
   "logs_last_update": "Logs mis à jour : {value}",
   "logs_load_error": "Impossible de charger les logs :\n\n{error}",
-  "no_logs": "Aucune ligne de log reçue."
+  "no_logs": "Aucune ligne de log reçue.",
+  "estimated_value": "Valeur estimée",
+  "update_available_title": "Mise à jour disponible",
+  "update_available_message": "Une nouvelle version est disponible.\n\nVersion actuelle : {current}\nNouvelle version : {latest}\n\nVoulez-vous télécharger la mise à jour ?",
+  "update_ready_title": "Mise à jour téléchargée",
+  "update_ready_message": "La version {version} a été téléchargée.\n\nVoulez-vous l’installer maintenant ?",
+  "update_complete_title": "Mise à jour terminée",
+  "update_complete_message": "La mise à jour a été installée.\nRedémarrez Pi Node Dashboard pour utiliser la nouvelle version.",
+  "update_error_title": "Erreur de mise à jour",
+  "update_download_error": "La mise à jour n’a pas pu être téléchargée :\n{error}",
+  "update_install_error": "La mise à jour n’a pas pu être installée.",
+  "update_install_error_detail": "La mise à jour n’a pas pu être installée :\n{error}"
 }

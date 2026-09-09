@@ -67,7 +67,18 @@ from ui.node_logs import NodeLogsWidget
 
 from ui.about import AboutDialog
 
-VERSION = "1.1"
+from services.pi_price import (
+    get_pi_price,
+    get_currency_for_language,
+)
+
+from services.updater import (
+    check_for_update,
+    download_update,
+    install_update,
+)
+
+VERSION = "1.2.1"
 
 
 class PiDashboard(QWidget):
@@ -114,6 +125,11 @@ class PiDashboard(QWidget):
         self.update_timer()
 
         self.refresh_all()
+
+        QTimer.singleShot(
+            2000,
+            self.check_for_updates,
+        )
 
     # --------------------------------------------------
     # UI
@@ -405,6 +421,10 @@ class PiDashboard(QWidget):
             tr("mainnet_total_upper")
         )
 
+        self.value_card = ValueCard(
+            tr("estimated_value")
+        )
+
         wallet_layout.addWidget(
             self.free_card
         )
@@ -415,6 +435,10 @@ class PiDashboard(QWidget):
 
         wallet_layout.addWidget(
             self.total_card
+        )
+
+        wallet_layout.addWidget(
+            self.value_card
         )
 
         self.wallet_group.setLayout(
@@ -558,6 +582,7 @@ class PiDashboard(QWidget):
         self.quorum_card.title_label.setText(tr("quorum_block"))
         self.incoming_card.title_label.setText(tr("incoming_peers"))
         self.outgoing_card.title_label.setText(tr("outgoing_peers"))
+        self.value_card.title_label.setText(tr("estimated_value"))
 
         self.wallet_group.setTitle(tr("wallet"))
         self.free_card.title_label.setText(tr("free_upper"))
@@ -641,6 +666,10 @@ class PiDashboard(QWidget):
                 "-"
             )
 
+            self.value_card.set_value(
+                "-"
+            )
+
             return
 
         try:
@@ -660,6 +689,26 @@ class PiDashboard(QWidget):
                 f"{wallet['total']:.7f} π"
             )
 
+            language = self.config.get(
+                "language",
+                "en",
+            )
+
+            currency, symbol = get_currency_for_language(
+                language
+            )
+
+            price = get_pi_price(currency)
+
+            if price is not None:
+                fiat_value = wallet["total"] * price
+
+                self.value_card.set_value(
+                    f"{symbol} {fiat_value:,.2f}"
+                )
+            else:
+                self.value_card.set_value("-")
+
         except Exception:
             self.free_card.set_value(
                 tr("error")
@@ -670,6 +719,10 @@ class PiDashboard(QWidget):
             )
 
             self.total_card.set_value(
+                "-"
+            )
+
+            self.value_card.set_value(
                 "-"
             )
 
@@ -1109,4 +1162,149 @@ class PiDashboard(QWidget):
                 self,
                 tr("pi_node_error"),
                 str(exc),
+            )
+
+    # --------------------------------------------------
+    # Updates
+    # --------------------------------------------------
+
+    def check_for_updates(self):
+        try:
+            update = check_for_update(
+                VERSION
+            )
+
+            if not update:
+                return
+
+            latest_version = update[
+                "version"
+            ]
+
+            box = QMessageBox(self)
+
+            box.setWindowTitle(
+                tr("update_available_title")
+            )
+
+            box.setText(
+                tr("update_available_message").format(
+                    current=VERSION,
+                    latest=latest_version,
+                )
+            )
+
+            yes_button = box.addButton(
+                tr("yes"),
+                QMessageBox.AcceptRole,
+            )
+
+            no_button = box.addButton(
+                tr("no"),
+                QMessageBox.RejectRole,
+            )
+
+            box.exec()
+
+            if box.clickedButton() != yes_button:
+                return
+
+        except Exception:
+            # Geen internet of GitHub niet bereikbaar:
+            # dashboard gewoon normaal laten werken.
+            pass
+
+
+    def download_and_install_update(
+        self,
+        update,
+    ):
+        try:
+            QApplication.setOverrideCursor(
+                Qt.WaitCursor
+            )
+
+            deb_path = download_update(
+                update
+            )
+
+        except Exception as exc:
+            QMessageBox.critical(
+                self,
+                tr("update_error_title"),
+                tr(
+                    "update_download_error"
+                ).format(
+                    error=exc
+                ),
+            )
+
+            return
+
+        finally:
+            QApplication.restoreOverrideCursor()
+
+            box = QMessageBox(self)
+
+            box.setWindowTitle(
+                tr("update_ready_title")
+            )
+
+            box.setText(
+                tr("update_ready_message").format(
+                    version=update["version"],
+                )
+            )
+
+            yes_button = box.addButton(
+                tr("yes"),
+                QMessageBox.AcceptRole,
+            )
+
+            no_button = box.addButton(
+                tr("no"),
+                QMessageBox.RejectRole,
+            )
+
+            box.exec()
+
+            if box.clickedButton() != yes_button:
+                return
+
+        try:
+            success = install_update(
+                deb_path
+            )
+
+            if success:
+                QMessageBox.information(
+                    self,
+                    tr(
+                        "update_complete_title"
+                    ),
+                    tr(
+                        "update_complete_message"
+                    ),
+                )
+
+            else:
+                QMessageBox.warning(
+                    self,
+                    tr(
+                        "update_error_title"
+                    ),
+                    tr(
+                        "update_install_error"
+                    ),
+                )
+
+        except Exception as exc:
+            QMessageBox.critical(
+                self,
+                tr("update_error_title"),
+                tr(
+                    "update_install_error_detail"
+                ).format(
+                    error=exc
+                ),
             )

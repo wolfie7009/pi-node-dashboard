@@ -117,5 +117,16 @@
   "logs_not_loaded": "Logi nie zostały jeszcze załadowane.",
   "logs_last_update": "Logi zaktualizowano: {value}",
   "logs_load_error": "Nie można załadować logów:\n\n{error}",
-  "no_logs": "Nie odebrano żadnych linii logu."
+  "no_logs": "Nie odebrano żadnych linii logu.",
+  "estimated_value": "Szacunkowa wartość",
+  "update_available_title": "Dostępna aktualizacja",
+  "update_available_message": "Dostępna jest nowa wersja.\n\nObecna wersja: {current}\nNowa wersja: {latest}\n\nCzy chcesz pobrać aktualizację?",
+  "update_ready_title": "Aktualizacja pobrana",
+  "update_ready_message": "Wersja {version} została pobrana.\n\nCzy chcesz ją teraz zainstalować?",
+  "update_complete_title": "Aktualizacja zakończona",
+  "update_complete_message": "Aktualizacja została zainstalowana.\nUruchom ponownie Pi Node Dashboard, aby korzystać z nowej wersji.",
+  "update_error_title": "Błąd aktualizacji",
+  "update_download_error": "Nie udało się pobrać aktualizacji:\n{error}",
+  "update_install_error": "Nie udało się zainstalować aktualizacji.",
+  "update_install_error_detail": "Nie udało się zainstalować aktualizacji:\n{error}"
 }

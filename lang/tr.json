@@ -117,5 +117,16 @@
   "logs_not_loaded": "Günlükler henüz yüklenmedi.",
   "logs_last_update": "Günlükler güncellendi: {value}",
   "logs_load_error": "Günlükler yüklenemedi:\n\n{error}",
-  "no_logs": "Günlük satırı alınmadı."
+  "no_logs": "Günlük satırı alınmadı.",
+  "estimated_value": "Tahmini değer",
+  "update_available_title": "Güncelleme mevcut",
+  "update_available_message": "Yeni bir sürüm mevcut.\n\nMevcut sürüm: {current}\nYeni sürüm: {latest}\n\nGüncellemeyi indirmek ister misiniz?",
+  "update_ready_title": "Güncelleme indirildi",
+  "update_ready_message": "{version} sürümü indirildi.\n\nŞimdi yüklemek ister misiniz?",
+  "update_complete_title": "Güncelleme tamamlandı",
+  "update_complete_message": "Güncelleme yüklendi.\nYeni sürümü kullanmak için Pi Node Dashboard'u yeniden başlatın.",
+  "update_error_title": "Güncelleme hatası",
+  "update_download_error": "Güncelleme indirilemedi:\n{error}",
+  "update_install_error": "Güncelleme yüklenemedi.",
+  "update_install_error_detail": "Güncelleme yüklenemedi:\n{error}"
 }

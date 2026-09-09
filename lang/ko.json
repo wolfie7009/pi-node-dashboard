@@ -117,5 +117,16 @@
   "logs_not_loaded": "로그가 아직 로드되지 않았습니다.",
   "logs_last_update": "로그 업데이트: {value}",
   "logs_load_error": "로그를 불러올 수 없습니다:\n\n{error}",
-  "no_logs": "수신된 로그 줄이 없습니다."
+  "no_logs": "수신된 로그 줄이 없습니다.",
+  "estimated_value": "예상 가치",
+  "update_available_title": "업데이트 사용 가능",
+  "update_available_message": "새 버전을 사용할 수 있습니다.\n\n현재 버전: {current}\n새 버전: {latest}\n\n업데이트를 다운로드하시겠습니까?",
+  "update_ready_title": "업데이트 다운로드 완료",
+  "update_ready_message": "버전 {version}이(가) 다운로드되었습니다.\n\n지금 설치하시겠습니까?",
+  "update_complete_title": "업데이트 완료",
+  "update_complete_message": "업데이트가 설치되었습니다.\n새 버전을 사용하려면 Pi Node Dashboard를 다시 시작하세요.",
+  "update_error_title": "업데이트 오류",
+  "update_download_error": "업데이트를 다운로드할 수 없습니다:\n{error}",
+  "update_install_error": "업데이트를 설치할 수 없습니다.",
+  "update_install_error_detail": "업데이트를 설치할 수 없습니다:\n{error}"
 }

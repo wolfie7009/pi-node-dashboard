@@ -117,5 +117,16 @@
   "logs_not_loaded": "Nhật ký chưa được tải.",
   "logs_last_update": "Nhật ký đã cập nhật: {value}",
   "logs_load_error": "Không thể tải nhật ký:\n\n{error}",
-  "no_logs": "Không nhận được dòng nhật ký nào."
+  "no_logs": "Không nhận được dòng nhật ký nào.",
+  "estimated_value": "Giá trị ước tính",
+  "update_available_title": "Có bản cập nhật",
+  "update_available_message": "Có phiên bản mới.\n\nPhiên bản hiện tại: {current}\nPhiên bản mới: {latest}\n\nBạn có muốn tải bản cập nhật không?",
+  "update_ready_title": "Đã tải bản cập nhật",
+  "update_ready_message": "Phiên bản {version} đã được tải xuống.\n\nBạn có muốn cài đặt ngay bây giờ không?",
+  "update_complete_title": "Cập nhật hoàn tất",
+  "update_complete_message": "Bản cập nhật đã được cài đặt.\nKhởi động lại Pi Node Dashboard để sử dụng phiên bản mới.",
+  "update_error_title": "Lỗi cập nhật",
+  "update_download_error": "Không thể tải bản cập nhật:\n{error}",
+  "update_install_error": "Không thể cài đặt bản cập nhật.",
+  "update_install_error_detail": "Không thể cài đặt bản cập nhật:\n{error}"
 }

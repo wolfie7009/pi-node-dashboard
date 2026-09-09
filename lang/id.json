@@ -117,5 +117,16 @@
   "logs_not_loaded": "Log belum dimuat.",
   "logs_last_update": "Log diperbarui: {value}",
   "logs_load_error": "Log tidak dapat dimuat:\n\n{error}",
-  "no_logs": "Tidak ada baris log yang diterima."
+  "no_logs": "Tidak ada baris log yang diterima.",
+  "estimated_value": "Perkiraan nilai",
+  "update_available_title": "Pembaruan tersedia",
+  "update_available_message": "Versi baru tersedia.\n\nVersi saat ini: {current}\nVersi baru: {latest}\n\nApakah Anda ingin mengunduh pembaruan?",
+  "update_ready_title": "Pembaruan telah diunduh",
+  "update_ready_message": "Versi {version} telah diunduh.\n\nApakah Anda ingin memasangnya sekarang?",
+  "update_complete_title": "Pembaruan selesai",
+  "update_complete_message": "Pembaruan telah dipasang.\nMulai ulang Pi Node Dashboard untuk menggunakan versi baru.",
+  "update_error_title": "Kesalahan pembaruan",
+  "update_download_error": "Pembaruan tidak dapat diunduh:\n{error}",
+  "update_install_error": "Pembaruan tidak dapat dipasang.",
+  "update_install_error_detail": "Pembaruan tidak dapat dipasang:\n{error}"
 }

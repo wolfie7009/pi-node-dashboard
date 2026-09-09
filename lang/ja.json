@@ -117,5 +117,16 @@
   "logs_not_loaded": "ログはまだ読み込まれていません。",
   "logs_last_update": "ログ更新: {value}",
   "logs_load_error": "ログを読み込めませんでした:\n\n{error}",
-  "no_logs": "ログ行を受信しませんでした。"
+  "no_logs": "ログ行を受信しませんでした。",
+  "estimated_value": "推定価値",
+  "update_available_title": "アップデートがあります",
+  "update_available_message": "新しいバージョンがあります。\n\n現在のバージョン: {current}\n新しいバージョン: {latest}\n\nアップデートをダウンロードしますか？",
+  "update_ready_title": "アップデートをダウンロードしました",
+  "update_ready_message": "バージョン {version} をダウンロードしました。\n\n今すぐインストールしますか？",
+  "update_complete_title": "アップデート完了",
+  "update_complete_message": "アップデートがインストールされました。\n新しいバージョンを使用するには Pi Node Dashboard を再起動してください。",
+  "update_error_title": "アップデートエラー",
+  "update_download_error": "アップデートをダウンロードできませんでした:\n{error}",
+  "update_install_error": "アップデートをインストールできませんでした。",
+  "update_install_error_detail": "アップデートをインストールできませんでした:\n{error}"
 }

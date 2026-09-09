@@ -117,5 +117,16 @@
   "logs_not_loaded": "日志尚未加载。",
   "logs_last_update": "日志已更新：{value}",
   "logs_load_error": "无法加载日志：\n\n{error}",
-  "no_logs": "未收到日志行。"
+  "no_logs": "未收到日志行。",
+  "estimated_value": "估算价值",
+  "update_available_title": "有可用更新",
+  "update_available_message": "有新版本可用。\n\n当前版本：{current}\n新版本：{latest}\n\n是否要下载更新？",
+  "update_ready_title": "更新已下载",
+  "update_ready_message": "版本 {version} 已下载。\n\n是否现在安装？",
+  "update_complete_title": "更新完成",
+  "update_complete_message": "更新已安装。\n请重新启动 Pi Node Dashboard 以使用新版本。",
+  "update_error_title": "更新错误",
+  "update_download_error": "无法下载更新：\n{error}",
+  "update_install_error": "无法安装更新。",
+  "update_install_error_detail": "无法安装更新：\n{error}"
 }
