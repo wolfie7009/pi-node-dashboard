@@ -6,6 +6,9 @@ from datetime import (
 from PySide6.QtCore import (
     Qt,
     QTimer,
+    QObject,
+    Signal,
+    QThread,
 )
 
 from PySide6.QtWidgets import (
@@ -22,6 +25,11 @@ from PySide6.QtWidgets import (
 from services.pi_node import (
     get_node_status,
     get_container_uptime,
+    get_latest_node_version,
+    node_update_available,
+    component_update_available,
+    clean_component_version,
+    update_node_container,
     node_action,
     set_cpu_limit,
 )
@@ -57,6 +65,7 @@ from PySide6.QtWidgets import (
     QGroupBox,
     QMessageBox,
     QTabWidget,
+    QProgressBar,
 )
 
 from ui.wallet_details import (
@@ -78,7 +87,29 @@ from services.updater import (
     install_update,
 )
 
-VERSION = "1.2.1"
+import subprocess
+
+VERSION = "1.3"
+
+
+class NodeUpdateWorker(QObject):
+    progress = Signal(int, str)
+    finished = Signal(dict)
+    failed = Signal(str)
+
+    def __init__(self, version):
+        super().__init__()
+        self.version = version
+
+    def run(self):
+        try:
+            result = update_node_container(
+                self.version,
+                progress_callback=lambda percent, stage: self.progress.emit(percent, stage),
+            )
+            self.finished.emit(result)
+        except Exception as exc:
+            self.failed.emit(str(exc))
 
 
 class PiDashboard(QWidget):
@@ -349,6 +380,66 @@ class PiDashboard(QWidget):
             cards
         )
 
+        self.container_version_label = QLabel(
+            tr("container_version").format(value="-")
+        )
+
+        self.protocol_version_label = QLabel(
+            tr("protocol_version").format(value="-")
+        )
+
+        self.horizon_version_label = QLabel(
+            tr("horizon_version").format(value="-")
+        )
+
+        self.stellar_core_version_label = QLabel(
+            tr("stellar_core_version").format(value="-")
+        )
+
+        for label in (
+            self.container_version_label,
+            self.protocol_version_label,
+            self.stellar_core_version_label,
+            self.horizon_version_label,
+        ):
+            node_layout.addWidget(label)
+
+        self.node_update_label = QLabel(
+            tr("node_update_checking")
+        )
+        node_layout.addWidget(
+            self.node_update_label
+        )
+
+        self.node_update_button = QPushButton(
+            tr("node_update_button")
+        )
+        self.node_update_button.setMinimumHeight(
+            32
+        )
+        self.node_update_button.clicked.connect(
+            self.install_node_update
+        )
+        self.node_update_button.hide()
+
+        node_layout.addWidget(
+            self.node_update_button
+        )
+
+        self.node_update_progress = QProgressBar()
+        self.node_update_progress.setRange(0, 100)
+        self.node_update_progress.setValue(0)
+        self.node_update_progress.setTextVisible(True)
+        self.node_update_progress.hide()
+        node_layout.addWidget(self.node_update_progress)
+
+        self.node_update_status_label = QLabel("")
+        self.node_update_status_label.setAlignment(Qt.AlignCenter)
+        self.node_update_status_label.hide()
+        node_layout.addWidget(self.node_update_status_label)
+
+        self.latest_node_update = None
+
         self.cpu_label = QLabel(
             "CPU: -"
         )
@@ -593,6 +684,9 @@ class PiDashboard(QWidget):
         self.start_button.setText(tr("start"))
         self.stop_button.setText(tr("stop"))
         self.restart_button.setText(tr("restart"))
+        self.node_update_button.setText(
+            tr("node_update_button")
+        )
 
         self.version_label.setText(
             tr("version_label").format(version=VERSION)
@@ -629,6 +723,10 @@ class PiDashboard(QWidget):
             node_data = get_node_status()
 
             self.apply_node_status(
+                node_data
+            )
+
+            self.refresh_node_update(
                 node_data
             )
 
@@ -725,6 +823,176 @@ class PiDashboard(QWidget):
             self.value_card.set_value(
                 "-"
             )
+
+    def refresh_node_update(
+        self,
+        node_data,
+    ):
+        current_container = node_data.get(
+            "container_version",
+            "-",
+        )
+
+        latest = get_latest_node_version()
+
+        if latest is None:
+            self.latest_node_update = None
+            self.node_update_button.hide()
+
+            self.node_update_label.setText(
+                tr("node_update_unavailable")
+            )
+            self.node_update_label.setStyleSheet(
+                "color: gray;"
+            )
+            return
+
+        latest_container = latest["version"]
+
+        if node_update_available(
+            current_container,
+            latest_container,
+        ):
+            lines = [
+                tr("node_update_available").format(
+                    current=current_container,
+                    latest=latest_container,
+                )
+            ]
+
+            current_core = node_data.get(
+                "stellar_core_version",
+                "-",
+            )
+            latest_core = latest.get(
+                "stellar_core_version"
+            )
+
+            if (
+                latest_core
+                and component_update_available(
+                    current_core,
+                    latest_core,
+                )
+            ):
+                lines.append(
+                    tr("node_update_core_change").format(
+                        current=clean_component_version(
+                            current_core
+                        ),
+                        latest=latest_core,
+                    )
+                )
+
+            current_horizon = node_data.get(
+                "horizon_version",
+                "-",
+            )
+            latest_horizon = latest.get(
+                "horizon_version"
+            )
+
+            if (
+                latest_horizon
+                and component_update_available(
+                    current_horizon,
+                    latest_horizon,
+                )
+            ):
+                lines.append(
+                    tr("node_update_horizon_change").format(
+                        current=clean_component_version(
+                            current_horizon
+                        ),
+                        latest=latest_horizon,
+                    )
+                )
+
+            self.latest_node_update = latest
+            self.node_update_button.show()
+
+            self.node_update_label.setText(
+                "\n".join(lines)
+            )
+            self.node_update_label.setStyleSheet(
+                "color: #9a6a00; font-weight: bold;"
+            )
+
+        else:
+            self.latest_node_update = None
+            self.node_update_button.hide()
+
+            self.node_update_label.setText(
+                tr("node_update_current").format(
+                    version=current_container,
+                )
+            )
+            self.node_update_label.setStyleSheet(
+                "color: #187a35;"
+            )
+
+
+    def install_node_update(self):
+        update = self.latest_node_update
+        if not update:
+            return
+
+        box = QMessageBox(self)
+        box.setWindowTitle(tr("node_update_confirm_title"))
+        box.setText(
+            tr("node_update_confirm_message").format(version=update["version"])
+        )
+        yes_button = box.addButton(tr("yes"), QMessageBox.AcceptRole)
+        box.addButton(tr("no"), QMessageBox.RejectRole)
+        box.exec()
+        if box.clickedButton() != yes_button:
+            return
+
+        self.node_update_button.setEnabled(False)
+        self.node_update_progress.setValue(0)
+        self.node_update_progress.show()
+        self.node_update_status_label.setText(tr("node_update_progress_prepare"))
+        self.node_update_status_label.show()
+
+        self.node_update_thread = QThread(self)
+        self.node_update_worker = NodeUpdateWorker(update["version"])
+        self.node_update_worker.moveToThread(self.node_update_thread)
+        self.node_update_thread.started.connect(self.node_update_worker.run)
+        self.node_update_worker.progress.connect(self.on_node_update_progress)
+        self.node_update_worker.finished.connect(self.on_node_update_finished)
+        self.node_update_worker.failed.connect(self.on_node_update_failed)
+        self.node_update_worker.finished.connect(self.node_update_thread.quit)
+        self.node_update_worker.failed.connect(self.node_update_thread.quit)
+        self.node_update_thread.finished.connect(self.node_update_worker.deleteLater)
+        self.node_update_thread.finished.connect(self.node_update_thread.deleteLater)
+        self.node_update_thread.start()
+
+    def on_node_update_progress(self, percent, stage):
+        self.node_update_progress.setValue(percent)
+        key = f"node_update_progress_{stage}"
+        self.node_update_status_label.setText(tr(key))
+
+    def on_node_update_finished(self, result):
+        self.node_update_progress.setValue(100)
+        self.node_update_status_label.setText(tr("node_update_progress_done"))
+        self.node_update_button.setEnabled(True)
+        QMessageBox.information(
+            self,
+            tr("node_update_complete_title"),
+            tr("node_update_complete_message").format(version=result["new_version"]),
+        )
+        self.refresh_all()
+
+    def on_node_update_failed(self, error):
+        self.node_update_button.setEnabled(True)
+        self.node_update_status_label.setText(tr("node_update_progress_failed"))
+        QMessageBox.critical(
+            self,
+            tr("node_update_error_title"),
+            tr("node_update_error_message").format(error=error),
+        )
+        self.refresh_all()
+
 
     def update_refresh_labels(self):
         now = datetime.now()
@@ -940,6 +1208,31 @@ class PiDashboard(QWidget):
                 }
                 """
             )
+
+        self.container_version_label.setText(
+            tr("container_version").format(
+                value=data.get("container_version", "-")
+            )
+        )
+
+        self.protocol_version_label.setText(
+            tr("protocol_version").format(
+                value=data.get("protocol_version", "-")
+            )
+        )
+
+        self.horizon_version_label.setText(
+            tr("horizon_version").format(
+                value=data.get("horizon_version", "-")
+            )
+        )
+
+        self.stellar_core_version_label.setText(
+            tr("stellar_core_version").format(
+                value=data.get("stellar_core_version", "-")
+            )
+        )
+
 
     def set_status_pill(
         self,
@@ -1209,6 +1502,10 @@ class PiDashboard(QWidget):
             if box.clickedButton() != yes_button:
                 return
 
+            self.download_and_install_update(
+                update
+            )
+
         except Exception:
             # Geen internet of GitHub niet bereikbaar:
             # dashboard gewoon normaal laten werken.
@@ -1238,38 +1535,37 @@ class PiDashboard(QWidget):
                     error=exc
                 ),
             )
-
             return
 
         finally:
             QApplication.restoreOverrideCursor()
 
-            box = QMessageBox(self)
+        box = QMessageBox(self)
 
-            box.setWindowTitle(
-                tr("update_ready_title")
+        box.setWindowTitle(
+            tr("update_ready_title")
+        )
+
+        box.setText(
+            tr("update_ready_message").format(
+                version=update["version"],
             )
+        )
 
-            box.setText(
-                tr("update_ready_message").format(
-                    version=update["version"],
-                )
-            )
+        yes_button = box.addButton(
+            tr("yes"),
+            QMessageBox.AcceptRole,
+        )
 
-            yes_button = box.addButton(
-                tr("yes"),
-                QMessageBox.AcceptRole,
-            )
+        box.addButton(
+            tr("no"),
+            QMessageBox.RejectRole,
+        )
 
-            no_button = box.addButton(
-                tr("no"),
-                QMessageBox.RejectRole,
-            )
+        box.exec()
 
-            box.exec()
-
-            if box.clickedButton() != yes_button:
-                return
+        if box.clickedButton() != yes_button:
+            return
 
         try:
             success = install_update(
@@ -1279,23 +1575,22 @@ class PiDashboard(QWidget):
             if success:
                 QMessageBox.information(
                     self,
-                    tr(
-                        "update_complete_title"
-                    ),
-                    tr(
-                        "update_complete_message"
-                    ),
+                    tr("update_complete_title"),
+                    tr("update_complete_message"),
                 )
+
+                subprocess.Popen(
+                    ["/usr/bin/pi-node-dashboard"],
+                    start_new_session=True,
+                )
+
+                QApplication.quit()
 
             else:
                 QMessageBox.warning(
                     self,
-                    tr(
-                        "update_error_title"
-                    ),
-                    tr(
-                        "update_install_error"
-                    ),
+                    tr("update_error_title"),
+                    tr("update_install_error"),
                 )
 
         except Exception as exc:

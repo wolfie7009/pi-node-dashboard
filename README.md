@@ -6,15 +6,22 @@
 
 It provides a simple graphical interface for checking node status, Horizon synchronization, peer connections, system usage, wallet information, claimable balances, transaction details, CPU limits, and Docker logs.
 
-Current version: **1.1**
+Current version: **1.3**
 
 ---
 
 ## Features
 
 - Pi Node container status
+- Pi Node container version
 - Protocol synchronization status
+- Protocol version
+- Stellar Core version
 - Horizon synchronization status
+- Horizon version
+- Automatic Pi Node update checks
+- Pi Node updates directly from the dashboard
+- Node update progress and rollback support
 - Current block and quorum block
 - Incoming and outgoing authenticated peers
 - CPU usage
@@ -26,6 +33,7 @@ Current version: **1.1**
   - Free balance
   - Locked / claimable balance
   - Mainnet total
+  - Estimated wallet value using the current Pi market price
 - Claimable balance unlock dates
 - Recent transactions
 - Transaction operation details
@@ -93,7 +101,7 @@ For normal users, the recommended installation method is the `.deb` package from
 Download the latest release and install it with:
 
 ```bash
-sudo apt install ./PiNodeDashboard-1.1-amd64.deb
+sudo apt install ./pi-node-dashboard_<version>_amd64.deb
 ```
 
 After installation, start **Pi Node Dashboard** from your application menu.
